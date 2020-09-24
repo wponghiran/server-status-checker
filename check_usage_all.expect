@@ -1,0 +1,33 @@
+#!/bin/expect
+
+set timeout 10
+log_user 1
+
+# Get username
+set username [exec whoami]
+
+# Grab the password
+stty -echo
+send_user -- "Type your password to continue: "
+expect_user -re "(.*)\n"
+send_user "\n"
+stty echo
+
+# Check if password is inputted
+if {[info exists expect_out]} {
+    set password $expect_out(1,string)
+    for {set i 1} {$i < 14} {incr i 1} {
+        puts "----> cbric-gpu$i"
+        set command "ssh -o PasswordAuthentication=yes -o PreferredAuthentications=keyboard-interactive,password -o PubkeyAuthentication=no $username@cbric-gpu$i.ecn.purdue.edu -o LogLevel=QUIET -t \"bash ./check_usage.sh\""
+        eval spawn $command
+        expect {
+            "assword: " { 
+                send "$password\r" 
+                interact
+            }
+        }
+    }
+} else {
+    puts "Timeout"
+}
+
