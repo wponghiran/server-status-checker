@@ -17,7 +17,7 @@ cp check_usage.sh ~
 export 'bash ~/.check_usage.sh' >> ~/.bashrc 
 ```
 
-3.  To check utilization on all machines, run:
+3. To check utilization on all machines, run:
 ```
 cp check_usage.sh ~
 expect check_usage_all.expect
@@ -26,4 +26,17 @@ By default, gpu1-13 will be probed. You may change target machines by editing th
 
 ![](/images/check_usage_all.JPG)
 
-> Last update: 9/24/2020
+4. To create a shortcut command to check utilization on all machines, run:
+```
+cp check_usage.sh ~
+cp check_usage_all.expect ~
+export 'alias stat_all="expect ~/check_usage_all.expect"' >> ~/.bashrc
+```
+
+After you start new terminal or reload .bashrc, you will be able to run ```stat_all``` to check all server status.
+
+## Known issues
+
+1. Expect interpreter isn't installed on local linux machines, so check utilization on all machines can be performed only on cbric-gpu machines.
+
+> Last update: 10/4/2020
