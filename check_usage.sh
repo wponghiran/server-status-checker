@@ -37,7 +37,11 @@ if type nvidia-smi &> /dev/null; then
             # NVIDIA_SMI_VERSION=$(modinfo nvidia | grep "^version:" | awk '{print $2}')
             NVIDIA_SMI_VERSION=$(echo "${NVIDIA_QUERY_OUTPUT}" | awk '$1 == "Driver" && $2 == "Version" {print $4}')
             # Grabbing PIDs with command below should work with NVIDIA_SMI_VERSION > 450.51.06
-            PIDs=$(echo "${NVIDIA_SMI_OUTPUT}" | awk '$2 == "GPU" && $5 == "PID" {flag = 1} flag && $5 > 0 {print $2, $5}' | awk -v GPU_ID=$GPU_ID '$1 == GPU_ID {print $2}')
+            if [[ $NVIDIA_SMI_VERSION = "450.51.06" || $NVIDIA_SMI_VERSION = "455.45.01" ]]; then
+                PIDs=$(echo "${NVIDIA_SMI_OUTPUT}" | awk '$2 == "GPU" && $5 == "PID" {flag = 1} flag && $5 > 0 {print $2, $5}' | awk -v GPU_ID=$GPU_ID '$1 == GPU_ID {print $2}')
+            else
+                PIDs=$(echo "${NVIDIA_SMI_OUTPUT}" | awk '$2 == "GPU" && $3 == "PID" {flag = 1} flag && $3 > 0 {print $2, $3}' | awk -v GPU_ID=$GPU_ID '$1 == GPU_ID {print $2}')
+            fi
             if [[ -z $PIDs ]]; then
                 printf "${RED} \_ GPU#%s Usage:${NC} %3s%% (%5s of %5s MB) - ${CYAN}Free${NC}\n" ${GPU_ID} ${GPU_UTIL[GPU_ID]} ${GPU_USED_MEM[GPU_ID]} ${GPU_TOTAL_MEM[GPU_ID]}
             else
